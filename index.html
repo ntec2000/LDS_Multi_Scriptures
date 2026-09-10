@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>LDS 다국어 경전</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;700&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Gothic:wght@400;700&family=Nanum+Myeongjo:wght@400;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Malgun Gothic',sans-serif;
+  height:100vh;overflow:hidden;user-select:none;background:var(--bg);color:var(--fg);
+}
+:root{
+  --bg:#ffffff;--bg2:#f5f5f7;--bg3:#e8e8ea;
+  --fg:#1a1a1a;--fg2:#555;--fg3:#999;
+  --primary:#1a3a6b;--primary2:#2a5aab;--accent:#c49a4a;
+  --border:#ddd;--nav-h:52px;--top-h:48px;
+}
+body.dark{
+  --bg:#0f0f0f;--bg2:#1c1c1e;--bg3:#2c2c2e;
+  --fg:#f0f0f0;--fg2:#aaa;--fg3:#666;
+  --primary:#1e3f7a;--primary2:#2a5aab;--border:#333;
+}
+body.sepia{
+  --bg:#f8f2e4;--bg2:#efe6d2;--bg3:#e5d8be;
+  --fg:#3b2a1a;--fg2:#6b4c3a;--fg3:#9b7a60;
+  --primary:#5a3820;--primary2:#7a5030;--border:#c8b090;
+}
+
+/* ── Layout ── */
+#app{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg)}
+#top-bar{
+  display:none;align-items:center;gap:6px;
+  padding:0 10px;height:var(--top-h);
+  background:var(--primary);color:#fff;
+  z-index:20;flex-shrink:0;
+}
+#top-bar.show{display:flex}
+#top-bar-title{flex:1;font-size:14px;font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tbtn{
+  background:rgba(255,255,255,.18);border:none;color:#fff;
+  padding:4px 8px;border-radius:5px;font-size:12px;cursor:pointer;white-space:nowrap;
+}
+.tbtn:active{background:rgba(255,255,255,.35)}
+
+#screen{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  background:var(--bg);-webkit-overflow-scrolling:touch;
+}
+
+#bottom-bar{
+  display:flex;align-items:center;height:var(--nav-h);
+  background:var(--primary);z-index:20;flex-shrink:0;
+}
+.bbar-btn{
+  flex:1;height:var(--nav-h);background:transparent;border:none;
+  color:#fff;font-size:22px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.bbar-btn:active{background:rgba(255,255,255,.15)}
+
+/* ── Sidebar ── */
+#sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100}
+#sb-overlay.show{display:block}
+#sidebar{
+  position:fixed;top:0;left:-290px;width:290px;height:100%;
+  background:var(--primary);z-index:101;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+#sidebar.open{left:0}
+#sb-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:16px 18px;background:rgba(0,0,0,.25);flex-shrink:0;
+}
+.sb-logo{font-size:17px;font-weight:700;color:#fff;letter-spacing:.3px;white-space:normal;line-height:1.3;word-break:keep-all}
+.sb-logo-img{width:30px;height:30px;object-fit:contain;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.12)}
+.sb-banner{padding:0 0 6px;text-align:center}
+.sb-banner img{width:100%;height:130px;object-fit:cover;display:block;opacity:1}
+.sb-close{background:transparent;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;padding:4px}
+#sb-nav{padding:6px 0;flex:1}
+.sb-item{
+  display:flex;align-items:center;gap:13px;padding:14px 20px;
+  color:rgba(255,255,255,.9);font-size:15px;
+  cursor:pointer;background:transparent;border:none;width:100%;text-align:left;
+}
+.sb-item:active{background:rgba(255,255,255,.12)}
+.sb-icon{font-size:18px;width:22px;text-align:center}
+.sb-div{height:1px;background:rgba(255,255,255,.15);margin:6px 16px}
+
+/* ── Screen header ── */
+.s-head{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;background:var(--primary);color:#fff;flex-shrink:0;
+}
+.s-head-title{font-size:17px;font-weight:600}
+
+/* ── Home ── */
+.home-hero{padding:22px 18px 26px;background:var(--primary);color:#fff}
+.home-title{font-size:22px;font-weight:700;letter-spacing:-.3px;padding:5px 0}
+.home-sub{font-size:13px;opacity:.75;margin-top:3px}
+.sec-label{font-size:11px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.6px;padding:14px 16px 6px}
+.sc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:2px 14px 10px}
+.sc-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:16px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;
+}
+.sc-card:active{background:var(--bg3)}
+.sc-name{font-size:13px;font-weight:600;color:var(--fg);line-height:1.3}
+.sc-cnt{font-size:11px;color:var(--fg3)}
+.quick-list{padding:0 14px 8px}
+.q-item{
+  display:flex;align-items:center;gap:12px;padding:13px 12px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  margin-bottom:8px;cursor:pointer;
+}
+.q-item:active{background:var(--bg3)}
+.qi-txt{flex:1}.qi-title{font-size:14px;font-weight:500;color:var(--fg)}
+.qi-sub{font-size:12px;color:var(--fg3);margin-top:2px}
+.qi-arrow{color:var(--fg3);font-size:17px}
+
+/* ── Book list ── */
+.book-list{padding:0}
+.bl-row{
+  display:flex;align-items:center;padding:14px 16px;
+  border-bottom:1px solid var(--border);cursor:pointer;
+  background:transparent;border:none;width:100%;text-align:left;color:var(--fg);
+}
+.bl-row:active{background:var(--bg2)}
+.bl-name{flex:1;font-size:15px;font-weight:600}.bl-eng{font-size:12px;color:var(--fg3);font-weight:400;margin-top:2px}
+.bl-arrow{color:var(--fg3);font-size:17px}
+
+/* ── Chapter grid ── */
+.ch-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px}
+.ch-btn{
+  aspect-ratio:1;background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:500;color:var(--fg);
+}
+.ch-btn:active{background:var(--primary2);color:#fff;border-color:var(--primary2)}
+.ch-btn.bm{border-color:var(--accent);color:var(--accent)}
+
+/* ── Chapter view ── */
+#vc{padding:14px 8px 24px}
+.vi{
+  display:flex;gap:5px;margin-bottom:18px;
+  cursor:pointer;border-radius:8px;padding:4px;
+}
+.vi:active{opacity:.6}
+.vnum{
+  font-size:15px;font-weight:700;color:var(--accent);
+  min-width:24px;width:auto;flex-shrink:0;padding-top:2px;line-height:1.55;padding-right:6px;text-align:left;
+}
+.vtexts{flex:1}
+.vt1{line-height:1.5;color:var(--fg);font-weight:700}
+.vt2{line-height:1.45;color:var(--fg2);margin-top:3px;font-style:italic}
+.vi.hl-y{background:rgba(255,224,102,.3)}
+.vi.hl-g{background:rgba(144,238,144,.3)}
+.vi.hl-b{background:rgba(135,206,235,.3)}
+.vi.hl-p{background:rgba(255,182,193,.3)}
+.vi.hl-o{background:rgba(255,179,71,.3)}
+.vi.hl-r{background:rgba(255,128,128,.3)}
+.vi.hl-pu{background:rgba(200,162,200,.3)}
+.vi.hl-cy{background:rgba(127,255,212,.3)}
+.vi.hl-lm{background:rgba(173,255,47,.3)}
+.vi.hl-sk{background:rgba(176,226,255,.3)}
+.note-dot{
+  width:8px;height:8px;border-radius:50%;margin-top:5px;
+  flex-shrink:0;display:none;
+}
+.vi.has-note .note-dot{display:block}
+.swipe-tip{text-align:center;padding:6px;font-size:11px;color:var(--fg3)}
+
+/* ── Verse popup ── */
+#vp-bg{display:none;position:fixed;inset:0;z-index:190}
+#vp-bg.show{display:block}
+#vp{
+  display:none;position:fixed;background:var(--bg);
+  border:1px solid var(--border);border-radius:14px;
+  box-shadow:0 6px 28px rgba(0,0,0,.28);z-index:200;min-width:210px;overflow:hidden;
+}
+#vp.show{display:block}
+#vp-ref{padding:7px 12px;font-size:11px;color:var(--fg3);background:var(--bg2);border-bottom:1px solid var(--border)}
+#vp-acts{display:grid;grid-template-columns:repeat(5,1fr)}
+.vp-act{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:11px 6px;cursor:pointer;background:transparent;border:none;
+  border-right:1px solid var(--border);color:var(--fg);font-size:11px;
+}
+.vp-act:last-child{border-right:none}
+.vp-act:active{background:var(--bg2)}
+.vp-act span{font-size:20px}
+
+/* ── Color picker ── */
+#cp{
+  display:none;position:fixed;background:var(--bg);
+  border:1px solid var(--border);border-radius:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.28);padding:14px;
+  z-index:210;width:max-content;max-width:300px;
+}
+#cp.show{display:block}
+.cp-grid{display:grid;grid-template-columns:repeat(5,38px);gap:12px;margin-bottom:12px}
+.cd{width:38px;height:38px;border-radius:50%;cursor:pointer;border:3px solid transparent;box-shadow:0 1px 3px rgba(0,0,0,.22)}
+.cd:active{transform:scale(1.18)}
+.cp-clear{text-align:center;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;cursor:pointer;font-size:14px;color:var(--fg3)}
+.cp-clear:active{background:var(--bg3)}
+
+/* ── Note modal ── */
+#nm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end}
+#nm-bg.show{display:flex}
+#nm{width:100%;background:var(--bg);border-radius:18px 18px 0 0;padding:18px}
+.nm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.nm-title{font-size:16px;font-weight:600;color:var(--fg)}
+.nm-close{background:transparent;border:none;color:var(--fg3);font-size:22px;cursor:pointer}
+.nm-colors{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px;justify-items:center}
+.nc-dot{width:30px;height:30px;border-radius:6px;cursor:pointer;border:2.5px solid transparent;box-shadow:0 1px 3px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--fg3)}
+.nc-dot.sel{border-color:var(--fg)}
+#nm-ta{
+  width:100%;min-height:100px;padding:10px;
+  border:1px solid var(--border);border-radius:9px;
+  background:var(--bg2);color:var(--fg);font-size:14px;
+  resize:none;font-family:inherit;outline:none;
+}
+.nm-save{
+  width:100%;margin-top:12px;padding:13px;
+  background:var(--primary);color:#fff;border:none;
+  border-radius:9px;font-size:15px;cursor:pointer;
+}
+
+/* ── Search ── */
+.srch-bar{
+  position:sticky;top:0;z-index:10;padding:10px 14px;
+  background:var(--bg);border-bottom:1px solid var(--border);
+}
+.srch-in{
+  width:100%;padding:10px 14px;border:1px solid var(--border);
+  border-radius:9px;background:var(--bg2);color:var(--fg);
+  font-size:15px;outline:none;font-family:inherit;
+}
+.sr-item{padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+.sr-item:active{background:var(--bg2)}
+.sr-ref{font-size:11px;font-weight:700;color:var(--primary2)}
+.sr-txt{font-size:14px;color:var(--fg);line-height:1.5;margin-top:3px}
+.sr-hl{background:#ffe066;color:#333;border-radius:2px;padding:0 2px}
+
+/* ── Hymns ── */
+.hy-item{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  border-bottom:1px solid var(--border);cursor:pointer;
+  background:transparent;border:none;border-bottom:1px solid var(--border);
+  width:100%;text-align:left;color:var(--fg);
+}
+.hy-item:active{background:var(--bg2)}
+.hy-num{
+  width:34px;height:34px;background:var(--primary2);color:#fff;
+  border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.hy-kor{font-size:15px;font-weight:500}
+.hy-eng{font-size:12px;color:var(--fg3);margin-top:2px}
+.hy-tabs{display:flex;border-bottom:2px solid var(--border)}
+.hy-tab{
+  flex:1;padding:12px;text-align:center;cursor:pointer;
+  font-size:14px;color:var(--fg3);background:transparent;border:none;
+  border-bottom:2.5px solid transparent;margin-bottom:-2px;
+}
+.hy-tab.on{color:var(--primary2);border-bottom-color:var(--primary2);font-weight:600}
+.hy-body{padding:16px}
+
+/* ── Settings ── */
+.cfg-grp{padding:0 16px}
+.cfg-sec-ttl{font-size:11px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.5px;padding-top:14px;margin-bottom:6px}
+.cfg-row{display:flex;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);gap:10px}
+.cfg-lbl{flex:1;font-size:15px;color:var(--fg)}
+.cfg-sel{
+  background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+  padding:6px 10px;color:var(--fg);font-size:14px;
+}
+.tgl{
+  width:44px;height:26px;background:var(--fg3);border-radius:13px;
+  position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0;
+}
+.tgl.on{background:var(--primary2)}
+.tgl::after{
+  content:'';position:absolute;width:20px;height:20px;background:#fff;
+  border-radius:50%;top:3px;left:3px;transition:left .2s;
+}
+.tgl.on::after{left:21px}
+.theme-row{display:flex;gap:8px;padding:8px 0}
+.thm-btn{
+  flex:1;padding:10px 6px;border-radius:8px;border:2px solid var(--border);
+  cursor:pointer;text-align:center;font-size:13px;background:var(--bg2);color:var(--fg);
+}
+.thm-btn.on{border-color:var(--primary2);background:var(--primary2);color:#fff}
+.font-row{display:flex;gap:7px;flex-wrap:wrap;padding:8px 0}
+.font-btn{
+  padding:8px 14px;border:2px solid var(--border);border-radius:20px;
+  background:var(--bg2);color:var(--fg);font-size:13px;cursor:pointer;
+}
+.font-btn.on{border-color:var(--primary2);background:var(--primary2);color:#fff}
+input[type=range]{-webkit-appearance:none;appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none;width:100%}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;background:var(--primary2);border-radius:50%;cursor:pointer;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* ── BNH (Bookmarks/Notes/Highlights) ── */
+.bnh-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.bnh-item:active{background:var(--bg2)}
+.bnh-ref{font-size:11px;font-weight:700;color:var(--primary2)}
+.bnh-txt{font-size:13px;color:var(--fg2);margin-top:3px;line-height:1.5}
+.bnh-note{font-size:13px;color:var(--fg);margin-top:3px;line-height:1.5;font-style:italic}
+.hl-dot{width:10px;height:10px;border-radius:50%;margin-top:3px;flex-shrink:0}
+
+/* ── About ── */
+.about-wrap{padding:28px 20px;text-align:center}
+.about-logo{font-size:52px;margin-bottom:14px}
+.about-name{font-size:22px;font-weight:700;color:var(--fg);margin-bottom:4px}
+.about-ver{font-size:13px;color:var(--fg3);margin-bottom:24px}
+.about-desc{font-size:14px;color:var(--fg2);line-height:1.75;text-align:left;margin-bottom:20px}
+.about-credit{font-size:13px;color:var(--fg3);padding:16px 0;border-top:1px solid var(--border)}
+
+/* ── Empty/Loading ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--fg3);text-align:center}
+.empty-icon{font-size:48px;margin-bottom:14px}
+.empty-txt{font-size:15px}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--fg3);font-size:14px}
+
+/* ── Toast ── */
+#toast{
+  display:none;position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.78);color:#fff;padding:8px 22px;
+  border-radius:20px;font-size:14px;z-index:999;pointer-events:none;white-space:nowrap;
+}
+#toast.show{display:block}
+
+.ch-nav-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-top:1px solid var(--border);margin-top:10px}
+.ch-nav-btn{padding:8px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-size:13px;cursor:pointer}
+
+.hy-type-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin:0}
+.hy-type-tab{flex:1;padding:10px 4px;background:none;border:none;font-size:13px;color:var(--fg3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s}
+.hy-type-tab.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+
+.sc-img-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px 16px}
+.sc-img-card{border-radius:8px;overflow:hidden;cursor:pointer;position:relative;padding-top:133%;background:var(--bg3)}
+.sc-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+.sc-img-lbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff;font-size:13px;font-weight:600;text-align:center;padding:18px 4px 8px;line-height:1.3}
+.hym-img-row{display:flex;gap:10px;padding:10px 16px;overflow-x:auto}
+.hym-img-card{flex-shrink:0;width:100px;cursor:pointer;text-align:center}
+.hym-img{width:100px;height:100px;object-fit:cover;border-radius:8px;display:block}
+.hym-img-lbl{font-size:12px;color:var(--fg);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-section-hdr{padding:6px 16px;font-size:11px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.5px;background:var(--bg2)}
+.vsel-wrap{padding:8px 12px 24px}
+.vsel-all-btn{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px}
+.vsel-all-btn:active{opacity:.8}
+
+/* ── Book grid ── */
+.bk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 12px 16px}
+.bk-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:10px 6px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.bk-card:active{background:var(--primary2);border-color:var(--primary2);color:#fff}
+.bk-card:active .bk-name,.bk-card:active .bk-eng,.bk-card:active .bk-cnt{color:#fff}
+.bk-name{font-size:12px;font-weight:700;color:var(--fg);line-height:1.3}
+.bk-eng{font-size:10px;color:var(--fg3);line-height:1.2}
+.bk-cnt{font-size:10px;color:var(--accent);margin-top:1px}
+
+/* ── Partial HL modal ── */
+#phl-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
+#phl-bg.show{display:flex}
+#phl-modal{width:100%;max-height:82vh;background:var(--bg);border-radius:18px 18px 0 0;padding:18px;overflow-y:auto}
+.has-phl .vt1 span,.has-phl .vt2 span{border-radius:2px}
+
+/* ── has-phl indicator ── */
+.vi.has-phl .vnum{color:var(--primary2)}
+
+/* ── Text selection toolbar ── */
+#sel-bar{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:400;
+  background:var(--primary);border-bottom:2px solid var(--accent);
+  padding:0 8px;height:44px;align-items:center;gap:4px;
+  box-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+.sel-btn{
+  background:rgba(255,255,255,.18);border:none;color:#fff;
+  padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.sel-btn:active{background:rgba(255,255,255,.35)}
+#sel-bar-space{flex:1}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Sidebar overlay -->
+  <div id="sb-overlay" onclick="closeSidebar()"></div>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="sb-head">
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;flex:1">
+        <img class="sb-logo-img" src="assets/img/logo.png" onerror="this.style.display='none'">
+        <div class="sb-logo" data-ui="app_title">LDS 다국어 경전</div>
+      </div>
+      <button class="sb-close" onclick="closeSidebar()">✕</button>
+    </div>
+    <div id="sb-nav">
+      <div class="sb-banner"><img src="assets/img/banner.jpg" onerror="this.parentNode.style.display='none'"></div>
+      <button class="sb-item" onclick="sbGo('home')"><span class="sb-icon">🏠</span><span data-ui="home">홈</span></button>
+      <button class="sb-item" onclick="sbGo('search')"><span class="sb-icon">🔍</span><span data-ui="search">검색</span></button>
+      <button class="sb-item" onclick="sbGo('language')"><span class="sb-icon">🌐</span><span data-ui="lang">언어 설정</span></button>
+      <button class="sb-item" onclick="sbGo('history')"><span class="sb-icon">🕐</span><span data-ui="history">기록</span></button>
+      <button class="sb-item" onclick="sbGo('bookmarks')"><span class="sb-icon">🔖</span><span data-ui="bookmarks">북마크</span></button>
+      <button class="sb-item" onclick="sbGo('notes')"><span class="sb-icon">📝</span><span data-ui="notes">노트</span></button>
+      <button class="sb-item" onclick="sbGo('highlights')"><span class="sb-icon">🎨</span><span data-ui="highlights">형광펜</span></button>
+      <div class="sb-div"></div>
+      <button class="sb-item" onclick="sbGo('share')"><span class="sb-icon">📤</span><span data-ui="share">앱 공유</span></button>
+      <button class="sb-item" onclick="sbGo('settings')"><span class="sb-icon">⚙️</span><span data-ui="settings">설정</span></button>
+      <button class="sb-item" onclick="sbGo('about')"><span class="sb-icon">ℹ️</span><span data-ui="about">정보</span></button>
+    </div>
+  </div>
+
+  <!-- Top bar (chapter view) -->
+  <div id="top-bar">
+    <div id="top-bar-title"></div>
+    <button class="tbtn" id="lang-btn" onclick="openLangPicker()">KOR|ENG</button>
+    <button class="tbtn" onclick="adjFs(-1)">A-</button>
+    <button class="tbtn" onclick="adjFs(1)">A+</button>
+    <button class="tbtn" onclick="sbGo('search')">🔍</button>
+  </div>
+
+  <!-- Screen -->
+  <div id="screen"></div>
+
+  <!-- Bottom bar -->
+  <div id="bottom-bar">
+    <button class="bbar-btn" onclick="toggleSidebar()">&#9776;</button>
+    <button class="bbar-btn" onclick="goBack()">&#8592;</button>
+    <button class="bbar-btn" onclick="goHome()">&#8962;</button>
+    <button class="bbar-btn" onclick="exitApp()">&#x2715;</button>
+  </div>
+</div>
+
+<!-- Verse popup backdrop -->
+<div id="vp-bg" onclick="closeVP()"></div>
+<!-- Verse popup -->
+<div id="vp">
+  <div id="vp-ref"></div>
+  <div id="vp-acts">
+    <button class="vp-act" onclick="vpHL()"><span>🎨</span><span data-ui="hl">형광</span></button>
+    <button class="vp-act" onclick="vpNote()"><span>📝</span><span data-ui="note">노트</span></button>
+    <button class="vp-act" onclick="vpBM()"><span>🔖</span><span data-ui="bm">북마크</span></button>
+    <button class="vp-act" onclick="vpPartial()"><span>✏️</span><span data-ui="word_hl">단어</span></button>
+    <button class="vp-act" onclick="vpShare()"><span>📤</span><span data-ui="shr">공유</span></button>
+  </div>
+</div>
+<!-- Color picker -->
+<div id="cp">
+  <div class="cp-grid">
+    <div class="cd" style="background:#FFE066" onclick="doHL('y')" title="노랑"></div>
+    <div class="cd" style="background:#7FE082" onclick="doHL('g')" title="초록"></div>
+    <div class="cd" style="background:#87CEEB" onclick="doHL('b')" title="파랑"></div>
+    <div class="cd" style="background:#FFB6C1" onclick="doHL('p')" title="분홍"></div>
+    <div class="cd" style="background:#FFB347" onclick="doHL('o')" title="주황"></div>
+    <div class="cd" style="background:#FF8080" onclick="doHL('r')" title="빨강"></div>
+    <div class="cd" style="background:#C8A2C8" onclick="doHL('pu')" title="보라"></div>
+    <div class="cd" style="background:#7FFFD4" onclick="doHL('cy')" title="청록"></div>
+    <div class="cd" style="background:#ADFF2F" onclick="doHL('lm')" title="연두"></div>
+    <div class="cd" style="background:#B0E2FF" onclick="doHL('sk')" title="하늘"></div>
+  </div>
+  <div class="cp-clear" onclick="doHL('')">✕</div>
+</div>
+<!-- Note modal -->
+<div id="nm-bg" onclick="nmBgClick(event)">
+  <div id="nm">
+    <div class="nm-top">
+      <div class="nm-title">노트 작성</div>
+      <button class="nm-close" onclick="closeNM()">✕</button>
+    </div>
+    <div class="nm-colors">
+      <div class="nc-dot sel" id="nc-y" style="background:#FFE066" onclick="selNC('y',this)"></div>
+      <div class="nc-dot" id="nc-g" style="background:#7FE082" onclick="selNC('g',this)"></div>
+      <div class="nc-dot" id="nc-b" style="background:#87CEEB" onclick="selNC('b',this)"></div>
+      <div class="nc-dot" id="nc-p" style="background:#FFB6C1" onclick="selNC('p',this)"></div>
+      <div class="nc-dot" id="nc-o" style="background:#FFB347" onclick="selNC('o',this)"></div>
+      <div class="nc-dot" id="nc-r" style="background:#FF8080" onclick="selNC('r',this)"></div>
+      <div class="nc-dot" id="nc-pu" style="background:#C8A2C8" onclick="selNC('pu',this)"></div>
+      <div class="nc-dot" id="nc-cy" style="background:#7FFFD4" onclick="selNC('cy',this)"></div>
+      <div class="nc-dot" id="nc-lm" style="background:#ADFF2F" onclick="selNC('lm',this)"></div>
+      <div class="nc-dot" id="nc-sk" style="background:#B0E2FF" onclick="selNC('sk',this)"></div>
+      <div class="nc-dot" id="nc-0" style="background:var(--bg2);border:1px solid var(--border)" onclick="selNC('0',this)">✕</div>
+    </div>
+    <textarea id="nm-ta" placeholder="노트를 입력하세요..."></textarea>
+    <button class="nm-save" onclick="saveNM()">저장</button>
+  </div>
+</div>
+<!-- Partial HL modal -->
+<div id="phl-bg" onclick="if(event.target===this)closePHL()">
+  <div id="phl-modal"></div>
+</div>
+<!-- Toast -->
+<div id="toast"></div>
+<!-- Text Selection Toolbar -->
+<div id="sel-bar">
+  <button class="sel-btn" data-act="copy">📋 복사</button>
+  <button class="sel-btn" data-act="hl">🎨 형광</button>
+  <button class="sel-btn" data-act="search">🔍 웹검색</button>
+  <button class="sel-btn" data-act="share">📤 공유</button>
+  <div id="sel-bar-space"></div>
+  <button class="sel-btn" data-act="close" style="background:rgba(255,255,255,.1);padding:6px 10px">✕</button>
+</div>
+
+<script src="./assets/data.js"></script>
+<script src="./assets/hymns_override.js"></script>
+<script src="./assets/app.js"></script>
+<script src="./assets/v211.js"></script>
+<script src="./assets/v212.js"></script>
+</body>
+</html>
