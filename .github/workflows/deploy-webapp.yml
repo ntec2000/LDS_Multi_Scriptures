@@ -1,0 +1,52 @@
+name: Deploy web app to GitHub Pages
+
+# Publishes the web app bundle (lds-webapp-*.zip) attached to a release.
+# Run manually: Actions > Deploy web app to GitHub Pages > Run workflow (optionally enter a tag).
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish (empty = latest release)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download web app bundle from release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          set -e
+          mkdir -p site
+          if [ -n "$TAG" ]; then
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'lds-webapp-*.zip' --output web.zip
+          else
+            gh release download --repo "$GITHUB_REPOSITORY" --pattern 'lds-webapp-*.zip' --output web.zip
+          fi
+          unzip -q web.zip -d site
+          touch site/.nojekyll
+          ls -la site
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
